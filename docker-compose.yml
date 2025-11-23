@@ -1,0 +1,55 @@
+version: '3.9'
+services:
+  # 🐇 RABBITMQ BROKER
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+
+  # 🌐 API HTTP
+  api:
+    build: ./api
+    container_name: hub-api
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+    ports:
+      - '3000:3000'
+
+  # ⚙️ WORKER: HUB COMMAND
+  hub-command:
+    build: ./hub-command-worker
+    container_name: hub-command
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+  # ⚙️ WORKER: HUB EVENT
+  hub-event:
+    build: ./hub-event-worker
+    container_name: hub-event
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+  # ⚙️ WORKER: HUB LOG
+  hub-log:
+    build: ./hub-log-worker
+    container_name: hub-log
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+volumes:
+  rabbit_data:
