@@ -4,9 +4,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
-  RabbitMQPubSubService,
+  RabbitMQPubSubConsumer,
   PubSubConsumerOptions,
-} from './rabbitmq-pubsub.service';
+} from './rabbitmq-pubsub.consumer';
 
 @Module({
   imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot()],
@@ -18,11 +18,11 @@ import {
       useValue: {
         exchange: process.env.EXCHANGE_NAME || 'hub',
         exchangeType: process.env.EXCHANGE_TYPE || 'topic',
-        queuePrefix: process.env.QUEUE_NAME || 'hub-command',
-        routingKeys: ['hub.command.*'],
+        queuePrefix: process.env.QUEUE_NAME || 'hub-event',
+        routingKeys: ['hub.event.*', 'hub.command.insert'],
       } as PubSubConsumerOptions,
     },
-    RabbitMQPubSubService,
+    RabbitMQPubSubConsumer,
   ],
 })
 export class AppModule {}

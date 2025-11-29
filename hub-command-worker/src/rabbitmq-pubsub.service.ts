@@ -4,6 +4,7 @@ import {
   OnModuleInit,
   OnModuleDestroy,
   Inject,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import * as amqp from 'amqp-connection-manager';
 import { ChannelWrapper } from 'amqp-connection-manager';
@@ -26,8 +27,8 @@ interface MessageEnvelope {
 }
 
 @Injectable()
-export class RabbitMQPubSubConsumer implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(RabbitMQPubSubConsumer.name);
+export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(RabbitMQPubSubService.name);
   private connection: amqp.AmqpConnectionManager;
   private channelWrapper: ChannelWrapper;
   private queueName: string;
@@ -96,6 +97,35 @@ export class RabbitMQPubSubConsumer implements OnModuleInit, OnModuleDestroy {
         );
       },
     });
+  }
+
+  async publish(routingKey: string, payload: unknown): Promise<void> {
+    try {
+      const envelope = {
+        pattern: routingKey,
+        data: payload,
+      };
+      const message = JSON.stringify(envelope);
+
+      await this.channelWrapper.publish(
+        this.options.exchange,
+        routingKey,
+        Buffer.from(message),
+        {
+          persistent: true,
+          contentType: 'application/json',
+        },
+      );
+      this.logger.log(
+        `📤 Published to exchange="${this.options.exchange}" routingKey="${routingKey}"`,
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        this.logger.error(`❌ Failed to publish message: ${error.message}`);
+      }
+
+      throw new InternalServerErrorException('Failed to publish message');
+    }
   }
 
   private async handleMessage(

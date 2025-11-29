@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { HUB_SERVICE } from './rabbitmq.constants';
-import { RabbitMQPublisher } from './rabbitmq.publisher';
+import { RabbitMQPubSubService } from './rabbitmq-pubsub.service';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { RabbitMQPublisher } from './rabbitmq.publisher';
       },
     ]),
   ],
-  providers: [RabbitMQPublisher],
-  exports: [ClientsModule, RabbitMQPublisher],
+  providers: [RabbitMQPubSubService],
+  exports: [ClientsModule, RabbitMQPubSubService],
 })
 export class RabbitMQModule {}

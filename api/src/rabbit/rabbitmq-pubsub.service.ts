@@ -10,8 +10,8 @@ import type { ChannelWrapper } from 'amqp-connection-manager';
 import type { ConfirmChannel } from 'amqplib';
 
 @Injectable()
-export class RabbitMQPublisher implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(RabbitMQPublisher.name);
+export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(RabbitMQPubSubService.name);
   private connection: amqp.AmqpConnectionManager;
   private channelWrapper: ChannelWrapper;
 

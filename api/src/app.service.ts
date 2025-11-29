@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { RabbitMQPublisher } from './rabbit/rabbitmq.publisher';
+import { RabbitMQPubSubService } from './rabbit/rabbitmq-pubsub.service';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly publisher: RabbitMQPublisher) {}
+  constructor(private readonly publisher: RabbitMQPubSubService) {}
 
   async insert(payload: unknown) {
     console.log('📤 Publishing event: hub.command.insert');
