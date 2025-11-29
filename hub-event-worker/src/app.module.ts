@@ -4,7 +4,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
-  RabbitMQPubSubConsumer,
+  RabbitMQPubSubService,
   PubSubConsumerOptions,
 } from './rabbitmq-pubsub.consumer';
 
@@ -22,7 +22,7 @@ import {
         routingKeys: ['hub.event.*', 'hub.command.insert'],
       } as PubSubConsumerOptions,
     },
-    RabbitMQPubSubConsumer,
+    RabbitMQPubSubService,
   ],
 })
 export class AppModule {}

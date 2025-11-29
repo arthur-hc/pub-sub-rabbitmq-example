@@ -138,7 +138,7 @@ export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
     const content = msg.content.toString();
 
     try {
-      const envelope = JSON.parse(content) as MessageEnvelope;
+      const envelope: MessageEnvelope = JSON.parse(content) as MessageEnvelope;
       const { pattern, data } = envelope;
 
       this.logger.log(
@@ -151,7 +151,7 @@ export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
       this.logger.debug(`✅ Message acknowledged: pattern="${pattern}"`);
     } catch (error) {
       if (error instanceof Error) {
-        this.logger.error(`❌ Error processing message: ${error.message}`);
+        this.logger.error(`❌ Failed to process message: ${error.message}`);
       }
       channel.nack(msg, false, false);
     }
