@@ -1,22 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
+import { Injectable } from '@nestjs/common';
+import { RabbitMQPublisher } from './rabbit/rabbitmq.publisher';
 
 @Injectable()
 export class AppService {
-  constructor(@Inject('HUB_SERVICE') private readonly client: ClientProxy) {}
+  constructor(private readonly publisher: RabbitMQPublisher) {}
 
-  getHealthStatus(): string {
-    return 'OK';
-  }
-
-  async insert(data: any) {
-    await lastValueFrom(this.client.emit('hub.command.insert', data));
-    console.log('Message sent to hub.command.insert:', data);
+  async insert(payload: unknown) {
+    console.log('📤 Publishing event: hub.command.insert');
+    await this.publisher.publish('hub.command.insert', payload);
+    console.log('✅ Event published: hub.command.insert');
   }
 
   async delete(id: string) {
-    await lastValueFrom(this.client.emit('hub.command.delete', { id }));
-    console.log('Message sent to hub.command.delete:', { id });
+    console.log('📤 Publishing event: hub.command.delete');
+    await this.publisher.publish('hub.command.delete', { id });
+    console.log('✅ Event published: hub.command.delete');
   }
 }

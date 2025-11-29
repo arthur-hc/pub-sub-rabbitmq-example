@@ -1,26 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { RabbitMQModule } from './rabbit/rabbitmq.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [
-    ClientsModule.register([
-      {
-        name: 'HUB_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: [
-            process.env.RABBITMQ_URL ?? 'amqp://guest:guest@localhost:5672',
-          ],
-          exchange: 'hub',
-          exchangeType: 'topic',
-          // queue: 'hub-api-queue',
-          queueOptions: { durable: true },
-        },
-      },
-    ]),
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), RabbitMQModule],
   controllers: [AppController],
   providers: [AppService],
 })
