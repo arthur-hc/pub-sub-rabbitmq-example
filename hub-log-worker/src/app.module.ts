@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import {
   RabbitMQPubSubService,
   PubSubConsumerOptions,
-} from './rabbitmq-pubsub.consumer';
+} from './rabbitmq-pubsub.service';
 
 @Module({
   imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot()],

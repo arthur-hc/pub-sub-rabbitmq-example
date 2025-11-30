@@ -6,13 +6,10 @@ import {
   Inject,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import * as amqp from 'amqp-connection-manager';
 import { ChannelWrapper } from 'amqp-connection-manager';
 import { ConfirmChannel, ConsumeMessage } from 'amqplib';
-
-interface IEventEmitter {
-  emitAsync(event: string, ...args: unknown[]): Promise<unknown[]>;
-}
 
 export interface PubSubConsumerOptions {
   exchange: string;
@@ -35,7 +32,7 @@ export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject('PUBSUB_OPTIONS') private readonly options: PubSubConsumerOptions,
-    @Inject('EventEmitter2') private readonly eventEmitter: IEventEmitter,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   onModuleInit() {
