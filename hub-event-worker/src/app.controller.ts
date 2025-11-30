@@ -16,13 +16,8 @@ export class AppController {
     this.appService.handleEventNotify(data);
   }
 
-  @OnEvent('hub.event.user.created')
+  @OnEvent('hub.event.user-created')
   handleEventUserCreated(data: unknown): void {
     this.appService.handleEventUserCreated(data);
-  }
-
-  @OnEvent('hub.command.insert')
-  handleCommandInsert(data: unknown): void {
-    this.appService.handleCommandInsert(data);
   }
 }

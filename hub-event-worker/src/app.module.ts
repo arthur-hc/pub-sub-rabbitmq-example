@@ -19,7 +19,7 @@ import {
         exchange: process.env.EXCHANGE_NAME || 'hub',
         exchangeType: process.env.EXCHANGE_TYPE || 'topic',
         queuePrefix: process.env.QUEUE_NAME || 'hub-event',
-        routingKeys: ['hub.event.*', 'hub.command.insert'],
+        routingKeys: ['hub.event.*'],
       } as PubSubConsumerOptions,
     },
     RabbitMQPubSubService,
