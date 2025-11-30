@@ -12,8 +12,8 @@ export class AppController {
   }
 
   @OnEvent('hub.command.insert')
-  handleInsert(data: unknown): void {
-    this.appService.handleInsertPubSub(data);
+  async handleInsert(data: unknown): Promise<void> {
+    await this.appService.handleInsertPubSub(data);
   }
 
   @OnEvent('hub.command.delete')
