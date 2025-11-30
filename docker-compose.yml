@@ -1,55 +1,127 @@
 version: '3.9'
+
 services:
   # 🐇 RABBITMQ BROKER
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - '5672:5672' # AMQP
+      - '15672:15672' # Management UI
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - rabbit_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hub-network
+    restart: unless-stopped
 
   # 🌐 API HTTP
   api:
-    build: ./api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
     container_name: hub-api
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
+      NODE_ENV: development
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      EXCHANGE_NAME: hub
+      EXCHANGE_TYPE: topic
+      PORT: 3000
     ports:
       - '3000:3000'
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    networks:
+      - hub-network
+    restart: unless-stopped
 
   # ⚙️ WORKER: HUB COMMAND
   hub-command:
-    build: ./hub-command-worker
+    build:
+      context: ./hub-command-worker
+      dockerfile: Dockerfile
     container_name: hub-command
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
+      NODE_ENV: development
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      EXCHANGE_NAME: hub
+      EXCHANGE_TYPE: topic
+      QUEUE_NAME: hub-command
+      PORT: 3001
+      WORKER_ID: command-1
+    volumes:
+      - ./hub-command-worker:/app
+      - /app/node_modules
+    networks:
+      - hub-network
+    restart: unless-stopped
 
   # ⚙️ WORKER: HUB EVENT
   hub-event:
-    build: ./hub-event-worker
+    build:
+      context: ./hub-event-worker
+      dockerfile: Dockerfile
     container_name: hub-event
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
+      NODE_ENV: development
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      EXCHANGE_NAME: hub
+      EXCHANGE_TYPE: topic
+      QUEUE_NAME: hub-event
+      PORT: 3003
+      WORKER_ID: event-1
+    volumes:
+      - ./hub-event-worker:/app
+      - /app/node_modules
+    networks:
+      - hub-network
+    restart: unless-stopped
 
   # ⚙️ WORKER: HUB LOG
   hub-log:
-    build: ./hub-log-worker
+    build:
+      context: ./hub-log-worker
+      dockerfile: Dockerfile
     container_name: hub-log
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
+      NODE_ENV: development
       RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      EXCHANGE_NAME: hub
+      EXCHANGE_TYPE: topic
+      QUEUE_NAME: hub-log
+      PORT: 3004
+      WORKER_ID: log-1
+    volumes:
+      - ./hub-log-worker:/app
+      - /app/node_modules
+    networks:
+      - hub-network
+    restart: unless-stopped
 
 volumes:
   rabbit_data:
+    driver: local
+
+networks:
+  hub-network:
+    driver: bridge

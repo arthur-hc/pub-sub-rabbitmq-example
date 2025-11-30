@@ -16,7 +16,7 @@ export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
   private channelWrapper: ChannelWrapper;
 
   private readonly url =
-    process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672';
+    process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672';
   private readonly exchange = process.env.EXCHANGE_NAME || 'hub';
   private readonly exchangeType = process.env.EXCHANGE_TYPE || 'topic';
 

@@ -11,7 +11,7 @@ import { RabbitMQPubSubService } from './rabbitmq-pubsub.service';
         transport: Transport.RMQ,
         options: {
           urls: [
-            process.env.RABBITMQ_URL || 'amqp://guest:guest@localhost:5672',
+            process.env.RABBITMQ_URL || 'amqp://guest:guest@rabbitmq:5672',
           ],
           exchange: process.env.EXCHANGE_NAME || 'hub',
           exchangeType: process.env.EXCHANGE_TYPE || 'topic',
