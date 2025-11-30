@@ -2,7 +2,60 @@
 
 Pub/Sub messaging system using NestJS + RabbitMQ with Docker.
 
-## 🚀 How to Use
+## � What is this?
+
+This is a **true Pub/Sub (broadcast)** system where:
+
+- The **API** publishes messages to RabbitMQ
+- **Workers** listen to messages based on routing patterns
+- Each worker receives its own copy of the message (no load balancing)
+
+### How it works:
+
+1. **API receives HTTP request** → Publishes message to RabbitMQ with a routing key (e.g., `hub.command.insert`)
+2. **RabbitMQ Exchange (topic)** → Routes message to queues based on patterns
+3. **Workers consume messages** → Each worker has an exclusive queue and processes its copy
+
+### Message Flow Example:
+
+```
+POST /api/hub { "name": "Arthur" }
+         ↓
+    API publishes: hub.command.insert
+         ↓
+    RabbitMQ Exchange (topic: "hub")
+         ↓
+    ┌────────────┬────────────┬────────────┐
+    ↓            ↓            ↓            ↓
+Command-W    Event-W      Log-W         (Future workers)
+Processes    Listens to   Logs ALL      Just add more!
+hub.command.* specific    messages
+             patterns     with #
+```
+
+### Workers explained:
+
+- **hub-command-worker**: Processes commands (`hub.command.*`)
+
+  - Receives: `hub.command.insert`, `hub.command.delete`, etc.
+  - After processing, can publish events (Event Choreography pattern) like hub.event.user-created
+
+- **hub-event-worker**: Processes events (`hub.event.*`)
+
+  - Receives: `hub.event.user-created`, `hub.event.notify`, etc.
+
+- **hub-log-worker**: Universal logger (pattern `#` = wildcard for ALL messages)
+  - Receives: Everything published to the exchange
+  - Uses `@OnEvent('**')` to catch all events internally
+
+### Key Architecture Decisions:
+
+✅ **Exclusive queues** (`hub-command-{PID}`) - Each worker instance gets its own queue  
+✅ **Topic exchange** - Flexible routing with patterns (`*` = one word, `#` = zero or more words)  
+✅ **EventEmitter2** - Internal routing with `@OnEvent` decorators (clean controller code)  
+✅ **Nodemon + Docker volumes** - Hot reload during development
+
+## �🚀 How to Use
 
 ### Start all services:
 
