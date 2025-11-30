@@ -9,7 +9,10 @@ import {
 } from './rabbitmq-pubsub.service';
 
 @Module({
-  imports: [ConfigModule.forRoot(), EventEmitterModule.forRoot()],
+  imports: [
+    ConfigModule.forRoot(),
+    EventEmitterModule.forRoot({ wildcard: true, delimiter: '.' }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,

@@ -11,23 +11,9 @@ export class AppController {
     return { status: 'ok', service: 'hub-log-worker' };
   }
 
-  @OnEvent('hub.command.insert')
-  logCommandInsert(data: unknown): void {
-    this.appService.logMessage('hub.command.insert', data);
-  }
-
-  @OnEvent('hub.command.delete')
-  logCommandDelete(data: unknown): void {
-    this.appService.logMessage('hub.command.delete', data);
-  }
-
-  @OnEvent('hub.event.notify')
-  logEventNotify(data: unknown): void {
-    this.appService.logMessage('hub.event.notify', data);
-  }
-
-  @OnEvent('hub.event.user.created')
-  logEventUserCreated(data: unknown): void {
-    this.appService.logMessage('hub.event.user.created', data);
+  @OnEvent('**')
+  logCommandInsert(param: { pattern: string; data: unknown }): void {
+    const { pattern, data } = param;
+    this.appService.logMessage(pattern, data);
   }
 }

@@ -142,7 +142,7 @@ export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
         `📥 Received: routingKey="${routingKey}" pattern="${pattern}"`,
       );
 
-      await this.eventEmitter.emitAsync(pattern, data);
+      await this.eventEmitter.emitAsync(pattern, { pattern, data });
 
       channel.ack(msg);
       this.logger.debug(`✅ Message acknowledged: pattern="${pattern}"`);
