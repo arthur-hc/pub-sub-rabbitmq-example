@@ -50,7 +50,6 @@ hub.command.* specific    messages
 
 ### Key Architecture Decisions:
 
-✅ **Exclusive queues** (`hub-command-{PID}`) - Each worker instance gets its own queue  
 ✅ **Topic exchange** - Flexible routing with patterns (`*` = one word, `#` = zero or more words)  
 ✅ **EventEmitter2** - Internal routing with `@OnEvent` decorators (clean controller code)  
 ✅ **Nodemon + Docker volumes** - Hot reload during development

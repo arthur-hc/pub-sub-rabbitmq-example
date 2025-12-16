@@ -64,11 +64,11 @@ export class RabbitMQPubSubService implements OnModuleInit, OnModuleDestroy {
         );
 
         await channel.assertQueue(this.queueName, {
-          exclusive: true,
+          exclusive: false,
           autoDelete: true,
-          durable: false,
+          durable: true,
         });
-        this.logger.log(`✅ Exclusive queue "${this.queueName}" created`);
+        this.logger.log(`✅ Queue "${this.queueName}" created`);
 
         for (const routingKey of this.options.routingKeys) {
           await channel.bindQueue(
